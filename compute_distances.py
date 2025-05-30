@@ -34,7 +34,7 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
 
     pq = [(Weight((0,0,0)), point1 , [point1])]
     # Distances dictionary
-    distances = {vertex: [(Weight((float('inf'),float('inf'),float('inf'))),[])] for vertex in cities}
+    distances=defaultdict(list)
     distances[point1] = [(Weight((0,0,0)),[point1])]
     # Visited set
     visited = set()
