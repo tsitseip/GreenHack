@@ -35,7 +35,7 @@ class AI(nn.Module):
 
     def train(self, data, epochs):
         '''
-            Expected data of shape (batch_size, N)
+            Expected data of shape (batch, N)
         '''
         optimizer = optim.Adam(self.model.parameters(), lr=0.001)
 
