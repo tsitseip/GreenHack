@@ -1,4 +1,4 @@
-import heapq
+import heapq,pickle
 class Weight:
     def __init__(self, weight:tuple):
         self.weight = weight
@@ -46,12 +46,9 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
                     distances[neighbor].pop(-1)
                 heapq.heappush(pq, (distance, neighbor, path + [neighbor]))
     return list(map(lambda x: x[1]+[str(x[0])],distances[point2]))
-graph_dict=[
-    {'start':'a','end':'b','weight':(1,10,45)},
-    {'start':'b','end':'c','weight':(2,5,55)},
-    {'start':'c','end':'d','weight':(5,5,23)},
-    {'start':'a','end':'d','weight':(8,1,66)}]
 
-lst=compute_distances('a','d',graph_dict,2)
-for ls in lst:
-    print(*ls)
+with open('graph.pkl', 'rb') as fp:
+    graph_dict=pickle.load(fp)
+    lst=compute_distances('Praha','Bratislava',graph_dict,7)
+    for ls in lst:
+        print(*ls)
