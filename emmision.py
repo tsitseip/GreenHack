@@ -1,6 +1,6 @@
 import pickle
 
-with open('dict.pkl', 'rb') as fp:
+with open('dictEm.pkl', 'rb') as fp:
     table = pickle.load(fp)
 
 

@@ -34,4 +34,3 @@ with open('dict_em.pkl', 'rb') as fp:
         graph.append((trip[5][0], trip[7][0], (trip[26][0], trip[25][0]/speeds[trip[13][0]], prices[trip[13][0]])))
 
 
-
