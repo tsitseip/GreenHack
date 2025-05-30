@@ -7,11 +7,12 @@
     Each reward is in range from 0 to 1 and given total reward R we give each path r_i*R reward.
 '''
 
-lmbd    = 0.5
-nju     = 0.5
-R       = 10
-N       = 10
-seed    = 42
+lmbd        = 0.5
+nju         = 0.5
+R           = 10.0
+N           = 3
+seed        = 42
+batch_size  = 1
 
 import torch
 import torch.nn as nn
@@ -25,6 +26,7 @@ class AI(nn.Module):
         self.nju = nju
         self.R = R
         self.N = N
+        self.batch_size = batch_size
         self.model = nn.Sequential(
             nn.Linear(self.N*3, self.N),
             nn.Softmax()
@@ -32,6 +34,11 @@ class AI(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
+    def calc_probs(self, emission, r):
+        utilities = -self.lmbd * emission + self.R * r * self.nju
+        probs = torch.softmax(utilities, dim=2)
+        return probs
 
     def train(self, data, epochs):
         '''
@@ -42,44 +49,79 @@ class AI(nn.Module):
         for epoch in range(epochs):
             optimizer.zero_grad()
 
+            # print(data["train"].shape)
             r = self.forward(data["train"])
-            print(r.shape)
+            # print(r.shape)
 
             emission = data["emission"]
-            utilities = -self.lmbd * emission + self.R * r * self.nju
-            probs = torch.softmax(utilities, dim=1)
-            loss = torch.tensor(len(data["test"]))
+            # print(emission.shape)
+            probs = self.calc_probs(emission, r)
+            loss = torch.zeros([data["train"].shape[0], data["train"].shape[1]])
 
-            for i in range(N):
-                loss += probs[:, i] * emission[:, i]
+            for i in range(self.N):
+                # print(loss.shape, i, probs[:, :, i], emission[:, :, i], probs[:, :, i] * emission[:, :, i], (probs[:, :, i] * emission[:, :, i]).shape)
+                loss += probs[:, :, i] * emission[:, :, i]
 
-            loss.backward()
+            total_loss = loss.sum()
+
+            total_loss.backward()
             optimizer.step()
+            print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss.item()}")
 
+    def predict(self, test):
+        emissions = torch.Tensor([emission for (emission, time, cost) in test])
+
+        data = []
+        for (emission, time, cost) in test:
+            # print(emission, time, cost)
+            data.extend([emission, time, cost])
+
+        input_tensor = torch.tensor([data], dtype=torch.float32)
+
+        r = self.forward(input_tensor)
+        # print(r.shape, r)
+
+        probs = self.calc_probs(emissions, r.unsqueeze(0))
+
+        loss = torch.tensor(probs * emissions).sum()
+
+        return probs, loss
 
 
 def transform(data, batch_size, seed):
     generator = np.random.RandomState(seed)
-    permutation = generator.permutation(data.shape[0])
+    permutation = generator.permutation(len(data))
 
-    emissions = []
-    train = []
+    emissions = [[] for _ in range(len(data) // batch_size)]
+    train = [[] for _ in range(len(data) // batch_size)]
 
-    for batch_i in range(data.shape[0] // batch_size):
-        batch = permutation[batch_i * batch_size:(batch_i + 1) * batch_size]
-        emissions.append([])
-        train.append([])
-        for (emission, time, cost) in batch:
-            emissions[-1].append(emission)
-            train[-1].append(emission)
-            train[-1].append(time)
-            train[-1].append(cost)
+    for batch_i in range(len(data) // batch_size):
+        batch_id = permutation[batch_i * batch_size:(batch_i + 1) * batch_size]
+        batch = [data[i] for i in batch_id]
+        for test in batch:
+            emissions[batch_i].append([])
+            train[batch_i].append([])
+            for (emission, time, cost) in test:
+                emissions[batch_i][-1].append(emission)
+                train[batch_i][-1].append(emission)
+                train[batch_i][-1].append(time)
+                train[batch_i][-1].append(cost)
     return {
-        "train": train,
-        "emission": emissions,
+        "train": torch.Tensor(train),
+        "emission": torch.Tensor(emissions),
     }
 
 
+dataset = [
+    [(2.5, 3.3, 1.6), (5.6, 4.1, 1.1), (0.5, 0.3, 0.1)],
+    [(6.1, 8.5, 10.6), (5.6, 4.1, 0.2), (0.9, 0.1, 0.1)],
+    [(4.4, 3.3, 2.2), (8.5, 4.3, 0.0), (0.1, 0.6, 100)]
+]
+
+data = transform(dataset, batch_size, seed)
+
+
 model = AI(lmbd, nju, R, N)
+model.train(data, 100)
 
-
+print(model.predict([(4, 5, 1), (6, 5, 4), (3, 4, 5)]))
