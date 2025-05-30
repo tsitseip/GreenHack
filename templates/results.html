@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Path Results</title>
+</head>
+<body>
+    <h1>Top {{ k }} Paths from {{ start }} to {{ end }}</h1>
+    {% if weights %}
+        <ul>
+        {% for weight in weights %}
+            <li>{{ weight }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No paths found.</p>
+    {% endif %}
+    <a href="/">Try Again</a>
+</body>
+</html>

@@ -44,7 +44,7 @@ with open('data_parsed_em.csv', 'r') as f:
 
 import pickle
 
-with open('dict.pkl', 'wb') as fp:
+with open('dictEm.pkl', 'wb') as fp:
     pickle.dump(dict, fp)
 
 
