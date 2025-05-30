@@ -32,8 +32,13 @@ with open('dictEm.pkl', 'rb') as fp:
     cachedDict = pickle.load(fp)
     for i in range(len(cachedDict['Subsidiary'])):
         transport = cachedDict['Adjusted transport'][i][0]
-        graph.append((cachedDict['Trip departure'][i][0], cachedDict['Location'][i][0], (cachedDict['Emission'][i][0], float(cachedDict['PA km'][i][0])/speeds[transport], prices[transport])))
+        edge = {
+            'start' : cachedDict['Trip departure'][i][0],
+            'end' : cachedDict['Location'][i][0],
+            'weight' : (float(cachedDict['Emission'][i][0]), float(cachedDict['PA km'][i][0])/speeds[transport], prices[transport])
+        }
+        graph.append(edge)
 
 with open('graph.pkl', 'wb') as fp:
-    pickle.dump(list, fp)
+    pickle.dump(graph, fp)
 
