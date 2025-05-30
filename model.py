@@ -58,14 +58,22 @@ class AI(nn.Module):
 
 
 
-def transform(data):
+def transform(data, batch_size, seed):
+    generator = np.random.RandomState(seed)
+    permutation = generator.permutation(data.shape[0])
+
     emissions = []
     train = []
-    for (emission, time, cost) in data:
-        emissions.append(emission)
-        train.append(emission)
-        train.append(time)
-        train.append(cost)
+
+    for batch_i in range(data.shape[0] // batch_size):
+        batch = permutation[batch_i * batch_size:(batch_i + 1) * batch_size]
+        emissions.append([])
+        train.append([])
+        for (emission, time, cost) in batch:
+            emissions[-1].append(emission)
+            train[-1].append(emission)
+            train[-1].append(time)
+            train[-1].append(cost)
     return {
         "train": train,
         "emission": emissions,
