@@ -28,9 +28,12 @@ prices = {
 
 graph = []
 
-with open('dict_em.pkl', 'rb') as fp:
+with open('dictEm.pkl', 'rb') as fp:
     cachedDict = pickle.load(fp)
-    for trip in cachedDict:
-        graph.append((trip[5][0], trip[7][0], (trip[26][0], trip[25][0]/speeds[trip[13][0]], prices[trip[13][0]])))
+    for i in range(len(cachedDict['Subsidiary'])):
+        transport = cachedDict['Adjusted transport'][i][0]
+        graph.append((cachedDict['Trip departure'][i][0], cachedDict['Location'][i][0], (cachedDict['Emission'][i][0], float(cachedDict['PA km'][i][0])/speeds[transport], prices[transport])))
 
+with open('graph.pkl', 'wb') as fp:
+    pickle.dump(list, fp)
 
