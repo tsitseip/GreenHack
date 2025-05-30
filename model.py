@@ -60,7 +60,7 @@ class AI(nn.Module):
 
             for i in range(self.N):
                 # print(loss.shape, i, probs[:, :, i], emission[:, :, i], probs[:, :, i] * emission[:, :, i], (probs[:, :, i] * emission[:, :, i]).shape)
-                loss += probs[:, :, i] * emission[:, :, i]
+                loss -= probs[:, :, i] * emission[:, :, i]
 
             total_loss = loss.sum()
 
@@ -125,3 +125,22 @@ model = AI(lmbd, nju, R, N)
 model.train(data, 100)
 
 print(model.predict([(4, 5, 1), (6, 5, 4), (3, 4, 5)]))
+
+
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 1, 20)
+models = [AI(lmbd, i, R, N) for i in x]
+for model in models:
+    model.train(data, 100)
+y = [model.predict([(4, 5, 1), (6, 5, 4), (3, 4, 5)])[1].item() for model in models]
+
+
+plt.plot(x, y, label="Loss vs nju")
+plt.title("Effect of nju on Loss")
+plt.xlabel("nju")
+plt.ylabel("Loss")
+plt.grid(True)
+plt.legend()
+plt.savefig("plot.png")
+plt.show()
