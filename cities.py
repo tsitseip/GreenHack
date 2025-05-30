@@ -9,4 +9,4 @@ with open('dictEm.pkl', 'rb') as fp:
         cities.add(cachedDict['Trip departure'][i])
 
 with open('cities.pkl', 'wb') as fp:
-    pickle.dump(set, fp)
+    pickle.dump(cities, fp)

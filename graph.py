@@ -35,7 +35,7 @@ with open('dictEm.pkl', 'rb') as fp:
         edge = {
             'start' : cachedDict['Trip departure'][i][0],
             'end' : cachedDict['Location'][i][0],
-            'weight' : (float(cachedDict['Emission'][i][0]), float(cachedDict['PA km'][i][0])/speeds[transport], prices[transport])
+            'weight' : (float(cachedDict['Emission'][i][0]), float(cachedDict['PA km'][i][0])/speeds[transport], float(cachedDict['PA km'][i][0])*prices[transport])
         }
         graph.append(edge)
 
