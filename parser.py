@@ -1,4 +1,4 @@
-with open('data_parsed.csv', 'r') as f:
+with open('data_parsed_em.csv', 'r') as f:
     line = f.readline()
     # print(line)
     columns = []
