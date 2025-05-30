@@ -1,10 +1,16 @@
 import heapq,pickle
+import random
+from collections import defaultdict
+
+with open('cities.pkl', 'rb') as w:
+    cities=pickle.load(w)
+
 class Weight:
     def __init__(self, weight:tuple):
         self.weight = weight
     def __lt__(self, other):
-        value = self.weight[0]*15 + self.weight[1] * 8 + self.weight[2] * 0.001
-        value1=other.weight[0]*15 + other.weight[1] * 8 + other.weight[2] * 0.001
+        value = self.weight[0]*40 + self.weight[1] * 6 + self.weight[2] * 0.001
+        value1=other.weight[0]*40 + other.weight[1] * 6 + other.weight[2] * 0.001
         return value<value1
     def __eq__(self, other):
         return self.weight == other.weight
@@ -15,7 +21,7 @@ class Weight:
 def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
     # Priority queue: (distance, vertex)
     #
-    graph_adjacency={}
+    graph_adjacency=defaultdict(list)
     for edge in graph_edges:
         start = edge['start']
         end = edge['end']
@@ -28,7 +34,7 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
 
     pq = [(Weight((0,0,0)), point1 , [point1])]
     # Distances dictionary
-    distances = {vertex: [(Weight((float('inf'),float('inf'),float('inf'))),[])] for vertex in graph_adjacency.keys()}
+    distances = {vertex: [(Weight((float('inf'),float('inf'),float('inf'))),[])] for vertex in cities}
     distances[point1] = [(Weight((0,0,0)),[point1])]
     # Visited set
     visited = set()
@@ -48,7 +54,15 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
     return list(map(lambda x: x[1]+[str(x[0])],distances[point2]))
 
 with open('graph.pkl', 'rb') as fp:
-    graph_dict=pickle.load(fp)
-    lst=compute_distances('Praha','Bratislava',graph_dict,7)
-    for ls in lst:
-        print(*ls)
+        with open('test_dataset.pkl','wb') as write:
+            graph_dict=pickle.load(fp)
+            llst=list(cities)
+            final = []
+            for i in range(50):
+                start=random.choice(llst)
+                end=random.choice(llst)
+                print(start,':',end)
+                lst=compute_distances(start,end,graph_dict,5)
+                for ls in lst:
+                    final.append(ls[-1])
+            pickle.dump(final,write)
