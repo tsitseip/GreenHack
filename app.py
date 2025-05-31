@@ -23,7 +23,7 @@ def index():
 def results():
     start = request.form['start']
     end = request.form['end']
-    k = int(request.form['k'])
+    k = 5
     sort_by = int(request.form['sort_by'])
 
     routes_raw = compute_distances(start, end, graph_dict, k, sort_by)
