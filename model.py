@@ -9,7 +9,7 @@
 
 lmbd        = 0.5
 nju         = 0.9
-R           = 10.0
+R           = 100.0
 N           = 5
 seed        = 42
 batch_size  = 5
@@ -32,9 +32,9 @@ class AI(nn.Module):
             nn.ReLU(),
             nn.Linear(self.N*20, self.N*40),
             nn.ReLU(),
-            nn.Linear(self.N*40, 2048),
-            nn.ReLU(),
-            nn.Linear(2048, self.N),
+            # nn.Linear(self.N*40, 2048),
+            # nn.ReLU(),
+            nn.Linear(self.N*40, self.N),
             nn.Softmax(dim=1)
         )
 
@@ -81,8 +81,6 @@ class AI(nn.Module):
         loss = torch.sum(probs * emission, dim=1).mean()
 
         return probs, loss
-
-
 def transform(data, batch_size, seed):
     generator = np.random.RandomState(seed)
 
@@ -108,50 +106,60 @@ def transform(data, batch_size, seed):
         "emission": torch.Tensor(emissions),
     }
 
-import pickle
-with open('train_dataset.pkl', 'rb') as f:
-    dataset = pickle.load(f)
+def train_m():
+    import pickle
+    with open('train_dataset.pkl', 'rb') as f:
+        dataset = pickle.load(f)
 
 
-with open("test_dataset.pkl", "rb") as f:
-    test = pickle.load(f)
+    with open("test_dataset.pkl", "rb") as f:
+        test = pickle.load(f)
 
-# print(dataset[:10])
-# print(test[:10])
-# dataset = [
-#     [(2.5, 3.3, 1.6), (5.6, 4.1, 1.1), (0.5, 0.3, 0.1)],
-#     [(6.1, 8.5, 10.6), (5.6, 4.1, 0.2), (0.9, 0.1, 0.1)],
-#     [(4.4, 3.3, 2.2), (8.5, 4.3, 0.0), (0.1, 0.6, 100)]
-# ]
+    # print(dataset[:10])
+    # print(test[:10])
+    # dataset = [
+    #     [(2.5, 3.3, 1.6), (5.6, 4.1, 1.1), (0.5, 0.3, 0.1)],
+    #     [(6.1, 8.5, 10.6), (5.6, 4.1, 0.2), (0.9, 0.1, 0.1)],
+    #     [(4.4, 3.3, 2.2), (8.5, 4.3, 0.0), (0.1, 0.6, 100)]
+    # ]
 
-data = transform(dataset, batch_size, seed)
-test_data = transform(test, 1, seed)
+    data = transform(dataset, batch_size, seed)
+    test_data = transform(test, 1, seed)
 
-# print(data["train"].shape)
+    # print(data["train"].shape)
 
-model = AI(lmbd, nju, R, N)
-model.train_model(data, 100)
-
-
-print(model.predict(test_data))
-
-torch.save(model.state_dict(), 'model')
-
-
-import matplotlib.pyplot as plt
-
-x = np.linspace(0, 1, 0)
-models = [AI(lmbd, i, R, N) for i in x]
-for model in models:
+    model = AI(lmbd, nju, R, N)
     model.train_model(data, 100)
-y = [model.predict(test_data)[1].item() for model in models]
 
 
-plt.plot(x, y, label="Loss vs nju")
-plt.title("Effect of nju on Loss")
-plt.xlabel("nju")
-plt.ylabel("Loss")
-plt.grid(True)
-plt.legend()
-plt.savefig("plot.png")
-plt.show()
+    print(model.predict(test_data))
+
+    torch.save(model.state_dict(), 'model')
+
+
+    import matplotlib.pyplot as plt
+
+    x = np.linspace(0, 1, 100)
+    models = [AI(lmbd, i, R, N) for i in x]
+    for model in models:
+        model.train_model(data, 100)
+    y = [model.predict(test_data)[1].item() for model in models]
+
+
+    plt.plot(x, y, label="Loss vs nju")
+    plt.title("Effect of nju on Loss")
+    plt.xlabel("nju")
+    plt.ylabel("Loss")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("plot.png")
+    plt.show()
+
+def helper(model, data):
+    data_t = transform([data], 1, seed)
+
+    pred = model.predict(data_t)
+    ans = []
+    for i in pred[0][0][0]:
+        ans.append(i.item()*R)
+    return ans

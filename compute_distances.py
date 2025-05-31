@@ -55,6 +55,7 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
                 heapq.heappush(pq, (distance, neighbor, path + [neighbor+'('+transport+')']))
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
+
 # with open('graph.pkl', 'rb') as fp:
 #         with open('train_dataset.pkl','wb') as write:
 #             graph_dict=pickle.load(fp)
@@ -72,3 +73,4 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
 #                     fn.append(ls[-1])
 #                 final.append(fn)
 #             pickle.dump(final,write)
+
