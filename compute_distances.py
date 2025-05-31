@@ -29,8 +29,8 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
             graph_adjacency[start]=[]
         if end not in graph_adjacency:
             graph_adjacency[end] = []
-        graph_adjacency[start].append((edge['end'],Weight(edge['weight'])))
-        graph_adjacency[end].append((start, Weight(edge['weight'])))
+        graph_adjacency[start].append((edge['end'],Weight(edge['weight']),edge['transport']))
+        graph_adjacency[end].append((start, Weight(edge['weight']),edge['transport']))
     #
 
     pq = [(Weight((0,0,0)), point1 , [point1])]
@@ -45,14 +45,14 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
         if current_vertex in visited:
             continue
         visited.add(current_vertex)
-        for neighbor, weight in graph_adjacency[current_vertex]:
+        for neighbor, weight, transport in graph_adjacency[current_vertex]:
             distance = Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight)))
             if len(distances[neighbor])<k or distance < distances[neighbor][-1][0]:
-                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight))),path+[neighbor]))
+                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight))),path+[neighbor+' '+transport]))
                 distances[neighbor] = sorted(distances[neighbor])
                 if len(distances[neighbor])>k:
                     distances[neighbor].pop(-1)
-                heapq.heappush(pq, (distance, neighbor, path + [neighbor]))
+                heapq.heappush(pq, (distance, neighbor, path + [neighbor+' '+transport]))
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
 # with open('graph.pkl', 'rb') as fp:
