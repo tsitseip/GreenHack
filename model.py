@@ -32,9 +32,9 @@ class AI(nn.Module):
             nn.ReLU(),
             nn.Linear(self.N*20, self.N*40),
             nn.ReLU(),
-            nn.Linear(self.N*40, 2048),
-            nn.ReLU(),
-            nn.Linear(2048, self.N),
+            # nn.Linear(self.N*40, 2048),
+            # nn.ReLU(),
+            nn.Linear(self.N*40, self.N),
             nn.Softmax(dim=1)
         )
 
@@ -140,7 +140,7 @@ torch.save(model.state_dict(), 'model')
 
 import matplotlib.pyplot as plt
 
-x = np.linspace(0, 1, 0)
+x = np.linspace(0, 1, 100)
 models = [AI(lmbd, i, R, N) for i in x]
 for model in models:
     model.train_model(data, 100)

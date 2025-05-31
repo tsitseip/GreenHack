@@ -60,7 +60,7 @@ with open('graph.pkl', 'rb') as fp:
             graph_dict=pickle.load(fp)
             llst=list(cities)
             final = []
-            for i in range(1000):
+            for i in range(50):
                 lst = []
                 while len(lst) != 5:
                     start=random.choice(llst)
