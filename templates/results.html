@@ -15,6 +15,7 @@
                         <strong>CO₂:</strong> {{ route.cost[0]|round(2) }},
                         <strong>Time:</strong> {{ route.cost[1]|round(2) }},
                         <strong>Price:</strong> {{ route.cost[2]|round(2) }}
+                        <strong>Awarding points for emissions:</strong> {{ route.evaluation |round(2) }}
                     </li>
                 {% endfor %}
 
