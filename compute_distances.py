@@ -48,11 +48,11 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
         for neighbor, weight, transport in graph_adjacency[current_vertex]:
             distance = Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight)))
             if len(distances[neighbor])<k or distance < distances[neighbor][-1][0]:
-                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight))),path+[neighbor+' '+transport]))
+                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight))),path+[neighbor+'('+transport+')']))
                 distances[neighbor] = sorted(distances[neighbor])
                 if len(distances[neighbor])>k:
                     distances[neighbor].pop(-1)
-                heapq.heappush(pq, (distance, neighbor, path + [neighbor+' '+transport]))
+                heapq.heappush(pq, (distance, neighbor, path + [neighbor+'('+transport+')']))
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
 # with open('graph.pkl', 'rb') as fp:
