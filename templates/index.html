@@ -14,25 +14,25 @@
         <form method="POST" action="/results">
             <div class="row mb-3">
                 <div class="col">
-                    <label>From</label>
-                    <select name="start" class="form-select" required>
-                        {% for city in cities %}
-                        <option value="{{ city }}">{{ city }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="startCity">From</label>
+                    <input type="text" id="startCity" name="start" class="form-control" placeholder="Start typing city name..." required list="startCityOptions">
                 </div>
                 <div class="col">
-                    <label>To</label>
-                    <select name="end" class="form-select" required>
-                        {% for city in cities %}
-                        <option value="{{ city }}">{{ city }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="endCity">To</label>
+                    <input type="text" id="endCity" name="end" class="form-control" placeholder="Start typing city name..." required list="endCityOptions">
                 </div>
             </div>
             <div class="mb-3">
                 <label>K (Top Routes)</label>
                 <input type="number" name="k" value="3" min="1" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Sort By</label>
+                <select name="sort_by" class="form-select" required>
+                    <option value="price">Price</option>
+                    <option value="time">Time</option>
+                    <option value="co2">CO2 Emissions</option>
+                </select>
             </div>
             <div class="text-center">
                 <button class="btn btn-primary">Find</button>
