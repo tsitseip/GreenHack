@@ -100,6 +100,8 @@ def transform(data, batch_size, seed):
         batch = [data[i] for i in batch_id]
         for test in batch:
             emissions[batch_i].append([])
+            time[batch_i].append([])
+            price[batch_i].append([])
             train[batch_i].append([])
             random.shuffle(test)
             # print(test)
