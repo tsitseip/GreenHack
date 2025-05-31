@@ -56,11 +56,11 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int,ordering:in
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
 # with open('graph.pkl', 'rb') as fp:
-#         with open('train_dataset.pkl','wb') as write:
+#         with open('test_dataset.pkl','wb') as write:
 #             graph_dict=pickle.load(fp)
 #             llst=list(cities)
 #             final = []
-#             for i in range(1000):
+#             for i in range(20):
 #                 lst = []
 #                 while len(lst) != 5:
 #                     start=random.choice(llst)
