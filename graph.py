@@ -40,7 +40,8 @@ with open('dictEm.pkl', 'rb') as fp:
             'weight' : (float(cachedDict['Emission'][i][0]), float(cachedDict['PA km'][i][0])/speeds[transport], float(cachedDict['PA km'][i][0])*prices[transport]),
             'transport' : transport
         }
-        graph.append(edge)
+        if edge not in graph:
+            graph.append(edge)
 
 with open('graph.pkl', 'wb') as fp:
     pickle.dump(graph, fp)
