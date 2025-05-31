@@ -32,7 +32,7 @@ def results():
     # Convert raw routes into structured format
     routes = []
     values = helper(model, list(map(lambda x: x[-1],routes_raw)))
-    cou=0;
+    cou=0
     for r in routes_raw:
         *cities, cost = r  # unpack: all but last = cities; last = cost tuple
         routes.append({
@@ -40,7 +40,7 @@ def results():
             "cost": cost,
             "evaluation": values[cou]
         })
-        cou+=1;
+        cou+=1
     return render_template('results.html', start=start, end=end, routes=routes)
 
 
