@@ -27,6 +27,8 @@ def results():
     sort_by = int(request.form['sort_by'])
 
     routes_raw = compute_distances(start, end, graph_dict, k, sort_by)
+    if not routes_raw:
+         return render_template('results.html', start=start, end=end, routes=[])
     while len(routes_raw)<k:
         routes_raw.append(routes_raw[-1])
     # Convert raw routes into structured format
