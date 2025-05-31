@@ -8,7 +8,7 @@
 '''
 
 lmbd        = 0.5
-nju         = 0.9
+nju         = 0.99
 R           = 100.0
 N           = 5
 seed        = 42
@@ -150,23 +150,23 @@ def train_m():
     torch.save(model.state_dict(), 'model')
 
 
-    import matplotlib.pyplot as plt
-
-    x = np.linspace(0, 1, 60)
-    models = [AI(lmbd, i, R, N) for i in x]
-    for model in models:
-        model.train_model(data, 100)
-    y = [model.predict(test_data)[1].item() for model in models]
-
-
-    plt.plot(x, y, label="Loss vs nju")
-    plt.title("Effect of nju on Loss")
-    plt.xlabel("nju")
-    plt.ylabel("Loss")
-    plt.grid(True)
-    plt.legend()
-    plt.savefig("plot.png")
-    plt.show()
+    # import matplotlib.pyplot as plt
+    #
+    # x = np.linspace(0, 1, 60)
+    # models = [AI(lmbd, i, R, N) for i in x]
+    # for model in models:
+    #     model.train_model(data, 100)
+    # y = [model.predict(test_data)[1].item() for model in models]
+    #
+    #
+    # plt.plot(x, y, label="Loss vs nju")
+    # plt.title("Effect of nju on Loss")
+    # plt.xlabel("nju")
+    # plt.ylabel("Loss")
+    # plt.grid(True)
+    # plt.legend()
+    # plt.savefig("plot.png")
+    # plt.show()
 
 def helper(model, data):
     data_t = transform([data], 1, seed)
@@ -177,4 +177,4 @@ def helper(model, data):
         ans.append(i.item()*R)
     return ans
 
-#train_m()
+# train_m()
