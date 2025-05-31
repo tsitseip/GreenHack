@@ -32,9 +32,9 @@ class AI(nn.Module):
             nn.ReLU(),
             nn.Linear(self.N*20, self.N*40),
             nn.ReLU(),
-            # nn.Linear(self.N*40, 2048),
-            # nn.ReLU(),
-            nn.Linear(self.N*40, self.N),
+            nn.Linear(self.N*40, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, self.N),
             nn.Softmax(dim=-1)
         )
 
@@ -61,8 +61,8 @@ class AI(nn.Module):
                 batch_emission = data["emission"][batch_idx]  # shape (batch_size, N)
                 batch_time = data["time"][batch_idx]  # shape (batch_size, N)
                 r = self.forward(batch_train)
-                utility = -self.lmbd * batch_emission + self.R * r * self.nju - batch_time
-                utility = torch.softmax(-utility, dim=-1)
+                utility = self.lmbd * batch_emission - self.R * r * self.nju + batch_time
+                utility = torch.softmax(utility, dim=-1)
                 loss = -torch.sum(utility * batch_emission, dim=1).mean()
                 loss.backward()
                 total_loss += loss.item()
@@ -80,7 +80,8 @@ class AI(nn.Module):
         r = self.forward(input_tensor)
         # print(r.shape, r)
 
-        probs = self.calc_probs(emission, r)
+        util = self.lmbd * emission - self.R * r * self.nju + test["time"]
+        probs = torch.softmax(util, dim=-1)
         loss = torch.sum(probs * emission, dim=1).mean()
 
         return probs, loss
@@ -92,8 +93,6 @@ def transform(data, batch_size, seed):
     price = [[] for _ in range(len(data) // batch_size)]
     train = [[] for _ in range(len(data) // batch_size)]
 
-    import random
-
     for batch_i in range(len(data) // batch_size):
         permutation = generator.permutation(len(data))
         batch_id = permutation[batch_i * batch_size:(batch_i + 1) * batch_size]
@@ -103,7 +102,7 @@ def transform(data, batch_size, seed):
             times[batch_i].append([])
             price[batch_i].append([])
             train[batch_i].append([])
-            random.shuffle(test)
+            np.random.shuffle(test)
             # print(test)
             # print(len(test))
             for (emission, time, cost) in test:
@@ -153,7 +152,7 @@ def train_m():
 
     import matplotlib.pyplot as plt
 
-    x = np.linspace(0, 1, 100)
+    x = np.linspace(0, 1, 60)
     models = [AI(lmbd, i, R, N) for i in x]
     for model in models:
         model.train_model(data, 100)
