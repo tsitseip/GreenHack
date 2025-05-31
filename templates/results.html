@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Path Results</title>
+    <title>Route Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Top {{ k }} Paths from {{ start }} to {{ end }}</h1>
-    {% if weights %}
-        <ul>
-        {% for weight in weights %}
-            <li>{{ weight }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No paths found.</p>
-    {% endif %}
-    <a href="/">Try Again</a>
+    <div class="container mt-5">
+        <h2>Routes from {{ start }} to {{ end }}</h2>
+        {% if routes %}
+            <ul class="list-group">
+                {% for route in routes %}
+                <li class="list-group-item">
+                    <strong>Path:</strong> {{ route.cities | join(' → ') }}<br>
+                    <strong>CO₂:</strong> {{ route.cost[0] }},
+                    <strong>Time:</strong> {{ route.cost[1] }},
+                    <strong>Price:</strong> {{ route.cost[2] }}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No routes found.</p>
+        {% endif %}
+        <a href="/" class="btn btn-secondary mt-3">Back</a>
+    </div>
 </body>
 </html>

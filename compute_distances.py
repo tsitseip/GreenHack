@@ -30,6 +30,7 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
         if end not in graph_adjacency:
             graph_adjacency[end] = []
         graph_adjacency[start].append((edge['end'],Weight(edge['weight'])))
+        graph_adjacency[end].append((start, Weight(edge['weight'])))
     #
 
     pq = [(Weight((0,0,0)), point1 , [point1])]
@@ -38,6 +39,7 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
     distances[point1] = [(Weight((0,0,0)),[point1])]
     # Visited set
     visited = set()
+    visited.add(point2)
     while pq:
         current_distance, current_vertex, path = heapq.heappop(pq)
         if current_vertex in visited:
@@ -51,18 +53,18 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
                 if len(distances[neighbor])>k:
                     distances[neighbor].pop(-1)
                 heapq.heappush(pq, (distance, neighbor, path + [neighbor]))
-    return list(map(lambda x: x[1]+[str(x[0])],distances[point2]))
+    return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
-with open('graph.pkl', 'rb') as fp:
-        with open('test_dataset.pkl','wb') as write:
-            graph_dict=pickle.load(fp)
-            llst=list(cities)
-            final = []
-            for i in range(50):
-                start=random.choice(llst)
-                end=random.choice(llst)
-                print(start,':',end)
-                lst=compute_distances(start,end,graph_dict,5)
-                for ls in lst:
-                    final.append(ls[-1])
-            pickle.dump(final,write)
+# with open('graph.pkl', 'rb') as fp:
+#         with open('test_dataset.pkl','wb') as write:
+#             graph_dict=pickle.load(fp)
+#             llst=list(cities)
+#             final = []
+#             for i in range(50):
+#                 start=random.choice(llst)
+#                 end=random.choice(llst)
+#                 print(start,':',end)
+#                 lst=compute_distances(start,end,graph_dict,5)
+#                 for ls in lst:
+#                     final.append(ls[-1])
+#             pickle.dump(final,write)

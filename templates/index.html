@@ -1,30 +1,43 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Efficient Path Finder</title>
+    <title>Find Routes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { margin: 40px; }
+        .form-container { max-width: 600px; margin: auto; }
+    </style>
 </head>
 <body>
-    <h1>Find Top-K Efficient Paths</h1>
-    <form action="/results" method="post">
-        <label for="start">Start Point:</label>
-        <select name="start" id="start" required>
-            {% for city in cities %}
-                <option value="{{ city }}">{{ city }}</option>
-            {% endfor %}
-        </select><br><br>
-
-        <label for="end">End Point:</label>
-        <select name="end" id="end" required>
-            {% for city in cities %}
-                <option value="{{ city }}">{{ city }}</option>
-            {% endfor %}
-        </select><br><br>
-
-        <label for="k">Number of Paths (K):</label>
-        <input type="number" id="k" name="k" min="1" required><br><br>
-
-        <input type="submit" value="Find Paths">
-    </form>
+    <div class="form-container">
+        <h2 class="text-center">Find Routes</h2>
+        <form method="POST" action="/results">
+            <div class="row mb-3">
+                <div class="col">
+                    <label>From</label>
+                    <select name="start" class="form-select" required>
+                        {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <label>To</label>
+                    <select name="end" class="form-select" required>
+                        {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label>K (Top Routes)</label>
+                <input type="number" name="k" value="3" min="1" class="form-control" required>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary">Find</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

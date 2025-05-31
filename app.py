@@ -1,21 +1,15 @@
-# app.py
-import pickle
 from flask import Flask, render_template, request
 from compute_distances import compute_distances
+import pickle
 
 app = Flask(__name__)
 
-# Load cities from pickle file
+# Load cities and graph
 with open('cities.pkl', 'rb') as f:
     cities = pickle.load(f)
 
-# Sample graph (keep as needed)
-graph_dict = [
-    {'start': 'a', 'end': 'b', 'weight': (1, 10, 45)},
-    {'start': 'b', 'end': 'c', 'weight': (2, 5, 55)},
-    {'start': 'c', 'end': 'd', 'weight': (5, 5, 23)},
-    {'start': 'a', 'end': 'd', 'weight': (8, 1, 66)}
-]
+with open('graph.pkl', 'rb') as fp:
+    graph_dict = pickle.load(fp)
 
 @app.route('/')
 def index():
@@ -27,10 +21,10 @@ def results():
     end = request.form['end']
     k = int(request.form['k'])
 
-    distances = compute_distances(start, end, graph_dict, k)
-    top_k_weights = distances.get(end, [])
+    paths = compute_distances(start, end, graph_dict, k)
+    formatted = [{'cities': p[:-1], 'cost': p[-1]} for p in paths]
 
-    return render_template('results.html', start=start, end=end, k=k, weights=top_k_weights)
+    return render_template('results.html', start=start, end=end, routes=formatted)
 
 if __name__ == '__main__':
     app.run(debug=True)

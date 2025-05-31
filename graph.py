@@ -32,7 +32,7 @@ with open('dictEm.pkl', 'rb') as fp:
     cachedDict = pickle.load(fp)
     for i in range(len(cachedDict['Subsidiary'])):
         transport = cachedDict['Adjusted transport'][i][0]
-        if float(cachedDict['Emission'][i][0]) == 0 and float(cachedDict['PA km'][i][0]) == 0 and float(cachedDict['PA km'][i][0]) == 0:
+        if float(cachedDict['Emission'][i][0]) == 0 or float(cachedDict['PA km'][i][0]) == 0 or float(cachedDict['PA km'][i][0]) == 0:
             continue
         edge = {
             'start' : cachedDict['Trip departure'][i][0],
