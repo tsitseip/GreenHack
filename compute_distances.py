@@ -55,16 +55,20 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
                 heapq.heappush(pq, (distance, neighbor, path + [neighbor+' '+transport]))
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
-# with open('graph.pkl', 'rb') as fp:
-#         with open('test_dataset.pkl','wb') as write:
-#             graph_dict=pickle.load(fp)
-#             llst=list(cities)
-#             final = []
-#             for i in range(50):
-#                 start=random.choice(llst)
-#                 end=random.choice(llst)
-#                 print(start,':',end)
-#                 lst=compute_distances(start,end,graph_dict,5)
-#                 for ls in lst:
-#                     final.append(ls[-1])
-#             pickle.dump(final,write)
+with open('graph.pkl', 'rb') as fp:
+        with open('train_dataset.pkl','wb') as write:
+            graph_dict=pickle.load(fp)
+            llst=list(cities)
+            final = []
+            for i in range(1000):
+                lst = []
+                while len(lst) != 5:
+                    start=random.choice(llst)
+                    end=random.choice(llst)
+                    print(i, ': ', start, ':', end)
+                    lst=compute_distances(start,end,graph_dict,5)
+                fn = []
+                for ls in lst:
+                    fn.append(ls[-1])
+                final.append(fn)
+            pickle.dump(final,write)

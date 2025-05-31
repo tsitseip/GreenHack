@@ -8,7 +8,7 @@
 '''
 
 lmbd        = 0.5
-nju         = 0.5
+nju         = 0.9
 R           = 10.0
 N           = 5
 seed        = 42
@@ -39,7 +39,7 @@ class AI(nn.Module):
         )
 
     def forward(self, x):
-        x = x.view(x.size(0), -1)  # flatten (batch, N*3)
+        x = x.view(x.size(0), -1)
         return self.model(x)
 
     def calc_probs(self, emission, r):
@@ -54,19 +54,19 @@ class AI(nn.Module):
         optimizer = optim.Adam(self.model.parameters(), lr=0.001)
 
         for epoch in range(epochs):
+            optimizer.zero_grad()
             total_loss = 0
             for batch_idx in range(len(data["train"])):
                 batch_train = data["train"][batch_idx]  # shape (batch_size, N*3)
                 batch_emission = data["emission"][batch_idx]  # shape (batch_size, N)
-                optimizer.zero_grad()
                 r = self.forward(batch_train)
                 loss = torch.sum(r * batch_emission, dim=1).mean()
                 loss.backward()
-                optimizer.step()
                 total_loss += loss.item()
             num = len(data["train"])
-            print(epoch, num)
-            # print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/num}")
+            # print(epoch, num)
+            optimizer.step()
+            print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/num}")
 
     def predict(self, test):
         data = test["train"]
@@ -78,7 +78,7 @@ class AI(nn.Module):
         # print(r.shape, r)
 
         probs = self.calc_probs(emission, r)
-        loss = torch.sum(probs * emission)
+        loss = torch.sum(probs * emission, dim=1).mean()
 
         return probs, loss
 
@@ -127,13 +127,15 @@ with open("test_dataset.pkl", "rb") as f:
 data = transform(dataset, batch_size, seed)
 test_data = transform(test, 1, seed)
 
-print(data["train"].shape)
+# print(data["train"].shape)
 
 model = AI(lmbd, nju, R, N)
 model.train_model(data, 100)
 
 
 print(model.predict(test_data))
+
+torch.save(model.state_dict(), 'model')
 
 
 import matplotlib.pyplot as plt
@@ -145,11 +147,11 @@ for model in models:
 y = [model.predict(test_data)[1].item() for model in models]
 
 
-# plt.plot(x, y, label="Loss vs nju")
-# plt.title("Effect of nju on Loss")
-# plt.xlabel("nju")
-# plt.ylabel("Loss")
-# plt.grid(True)
-# plt.legend()
-# plt.savefig("plot.png")
-# plt.show()
+plt.plot(x, y, label="Loss vs nju")
+plt.title("Effect of nju on Loss")
+plt.xlabel("nju")
+plt.ylabel("Loss")
+plt.grid(True)
+plt.legend()
+plt.savefig("plot.png")
+plt.show()
