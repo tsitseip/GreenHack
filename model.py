@@ -59,8 +59,11 @@ class AI(nn.Module):
             for batch_idx in range(len(data["train"])):
                 batch_train = data["train"][batch_idx]  # shape (batch_size, N*3)
                 batch_emission = data["emission"][batch_idx]  # shape (batch_size, N)
+                batch_time = data["time"][batch_idx]  # shape (batch_size, N)
                 r = self.forward(batch_train)
-                loss = torch.sum(r * batch_emission, dim=1).mean()
+                utility = -self.lmbd * batch_emission + self.R * r * self.nju - batch_time
+                utility = torch.softmax(utility, dim=1)
+                loss = torch.sum(utility * batch_emission, dim=1).mean()
                 loss.backward()
                 total_loss += loss.item()
             num = len(data["train"])
@@ -85,7 +88,11 @@ def transform(data, batch_size, seed):
     generator = np.random.RandomState(seed)
 
     emissions = [[] for _ in range(len(data) // batch_size)]
+    time = [[] for _ in range(len(data) // batch_size)]
+    price = [[] for _ in range(len(data) // batch_size)]
     train = [[] for _ in range(len(data) // batch_size)]
+
+    import random
 
     for batch_i in range(len(data) // batch_size):
         permutation = generator.permutation(len(data))
@@ -94,16 +101,21 @@ def transform(data, batch_size, seed):
         for test in batch:
             emissions[batch_i].append([])
             train[batch_i].append([])
+            random.shuffle(test)
             # print(test)
             # print(len(test))
             for (emission, time, cost) in test:
                 emissions[batch_i][-1].append(emission)
+                time[batch_i][-1].append(time)
+                price[batch_i][-1].append(cost)
                 train[batch_i][-1].append(emission)
                 train[batch_i][-1].append(time)
                 train[batch_i][-1].append(cost)
     return {
         "train": torch.Tensor(train),
         "emission": torch.Tensor(emissions),
+        "time": torch.Tensor(time),
+        "cost": torch.Tensor(price),
     }
 
 def train_m():
