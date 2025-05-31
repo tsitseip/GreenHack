@@ -27,12 +27,12 @@
                 <input type="number" name="k" value="3" min="1" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label>Sort By</label>
-                <select name="sort_by" class="form-select" required>
-                    <option value="price">Price</option>
-                    <option value="time">Time</option>
-                    <option value="co2">CO2 Emissions</option>
-                </select>
+                <label for="sort_by">Sort By:</label>
+                <select name="sort_by" id="sort_by" required>
+                    <option value="0">Emissions</option>
+                    <option value="1">Time</option>
+                    <option value="2">Price</option>
+                </select><br><br>
             </div>
             <div class="text-center">
                 <button class="btn btn-primary">Find</button>

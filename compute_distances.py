@@ -6,11 +6,12 @@ with open('cities.pkl', 'rb') as w:
     cities=pickle.load(w)
 
 class Weight:
-    def __init__(self, weight:tuple):
+    def __init__(self, weight:tuple, ordering:int):
         self.weight = weight
+        self.ordering = ordering
     def __lt__(self, other):
-        value = self.weight[0]*40 + self.weight[1] * 6 + self.weight[2] * 0.001
-        value1=other.weight[0]*40 + other.weight[1] * 6 + other.weight[2] * 0.001
+        value = self.weight[self.ordering]*40 + self.weight[(self.ordering+1)%3] * 6 + self.weight[(self.ordering+2)%3] * 0.001
+        value1=other.weight[self.ordering]*40 + other.weight[(self.ordering+1)%3] * 6 + other.weight[(self.ordering+2)%3] * 0.001
         return value<value1
     def __eq__(self, other):
         return self.weight == other.weight
@@ -18,7 +19,7 @@ class Weight:
         return str(self.weight)
 # emissions, time, price
 
-def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
+def compute_distances(point1:str, point2:str, graph_edges:list,k:int,ordering:int):
     # Priority queue: (distance, vertex)
     #
     graph_adjacency=defaultdict(list)
@@ -29,14 +30,13 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
             graph_adjacency[start]=[]
         if end not in graph_adjacency:
             graph_adjacency[end] = []
-        graph_adjacency[start].append((edge['end'],Weight(edge['weight']),edge['transport']))
-        graph_adjacency[end].append((start, Weight(edge['weight']),edge['transport']))
+        graph_adjacency[start].append((edge['end'],Weight(edge['weight'],ordering),edge['transport']))
+        graph_adjacency[end].append((start, Weight(edge['weight'],ordering),edge['transport']))
     #
-
-    pq = [(Weight((0,0,0)), point1 , [point1])]
+    pq = [(Weight((0,0,0),ordering), point1 , [point1])]
     # Distances dictionary
     distances=defaultdict(list)
-    distances[point1] = [(Weight((0,0,0)),[point1])]
+    distances[point1] = [(Weight((0,0,0),ordering),[point1])]
     # Visited set
     visited = set()
     visited.add(point2)
@@ -46,29 +46,29 @@ def compute_distances(point1:str, point2:str, graph_edges:list,k:int):
             continue
         visited.add(current_vertex)
         for neighbor, weight, transport in graph_adjacency[current_vertex]:
-            distance = Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight)))
+            distance = Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight)),ordering)
             if len(distances[neighbor])<k or distance < distances[neighbor][-1][0]:
-                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight))),path+[neighbor+'('+transport+')']))
+                distances[neighbor].append((Weight(tuple(x + y for x, y in zip(current_distance.weight,weight.weight)),ordering),path+[neighbor+'('+transport+')']))
                 distances[neighbor] = sorted(distances[neighbor])
                 if len(distances[neighbor])>k:
                     distances[neighbor].pop(-1)
                 heapq.heappush(pq, (distance, neighbor, path + [neighbor+'('+transport+')']))
     return list(map(lambda x: x[1]+[x[0].weight],distances[point2]))
 
-with open('graph.pkl', 'rb') as fp:
-        with open('train_dataset.pkl','wb') as write:
-            graph_dict=pickle.load(fp)
-            llst=list(cities)
-            final = []
-            for i in range(1000):
-                lst = []
-                while len(lst) != 5:
-                    start=random.choice(llst)
-                    end=random.choice(llst)
-                    print(i, ': ', start, ':', end)
-                    lst=compute_distances(start,end,graph_dict,5)
-                fn = []
-                for ls in lst:
-                    fn.append(ls[-1])
-                final.append(fn)
-            pickle.dump(final,write)
+# with open('graph.pkl', 'rb') as fp:
+#         with open('train_dataset.pkl','wb') as write:
+#             graph_dict=pickle.load(fp)
+#             llst=list(cities)
+#             final = []
+#             for i in range(1000):
+#                 lst = []
+#                 while len(lst) != 5:
+#                     start=random.choice(llst)
+#                     end=random.choice(llst)
+#                     print(i, ': ', start, ':', end)
+#                     lst=compute_distances(start,end,graph_dict,5)
+#                 fn = []
+#                 for ls in lst:
+#                     fn.append(ls[-1])
+#                 final.append(fn)
+#             pickle.dump(final,write)

@@ -10,13 +10,14 @@
         {% if routes %}
             <ul class="list-group">
                 {% for route in routes %}
-                <li class="list-group-item">
-                    <strong>Path:</strong> {{ route.cities | join(' → ') }}<br>
-                    <strong>CO₂:</strong> {{ route.cost[0]|round(2) }},
-                    <strong>Time:</strong> {{ route.cost[1]|round(2) }},
-                    <strong>Price:</strong> {{ route.cost[2]|round(2) }}
-                </li>
+                    <li class="list-group-item">
+                        <strong>Path:</strong> {{ route.cities | join(' → ') }}<br>
+                        <strong>CO₂:</strong> {{ route.cost[0]|round(2) }},
+                        <strong>Time:</strong> {{ route.cost[1]|round(2) }},
+                        <strong>Price:</strong> {{ route.cost[2]|round(2) }}
+                    </li>
                 {% endfor %}
+
             </ul>
         {% else %}
             <p>No routes found.</p>

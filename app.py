@@ -20,11 +20,22 @@ def results():
     start = request.form['start']
     end = request.form['end']
     k = int(request.form['k'])
+    sort_by = int(request.form['sort_by'])
 
-    paths = compute_distances(start, end, graph_dict, k)
-    formatted = [{'cities': p[:-1], 'cost': p[-1]} for p in paths]
+    routes_raw = compute_distances(start, end, graph_dict, k, sort_by)
 
-    return render_template('results.html', start=start, end=end, routes=formatted)
+    # Convert raw routes into structured format
+    routes = []
+    for r in routes_raw:
+        *cities, cost = r  # unpack: all but last = cities; last = cost tuple
+        routes.append({
+            "cities": cities,
+            "cost": cost
+        })
+
+
+    return render_template('results.html', start=start, end=end, routes=routes)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
