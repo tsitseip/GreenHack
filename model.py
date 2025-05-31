@@ -35,7 +35,7 @@ class AI(nn.Module):
             # nn.Linear(self.N*40, 2048),
             # nn.ReLU(),
             nn.Linear(self.N*40, self.N),
-            nn.Softmax(dim=1)
+            nn.Softmax(dim=-1)
         )
 
     def forward(self, x):
@@ -62,8 +62,8 @@ class AI(nn.Module):
                 batch_time = data["time"][batch_idx]  # shape (batch_size, N)
                 r = self.forward(batch_train)
                 utility = -self.lmbd * batch_emission + self.R * r * self.nju - batch_time
-                utility = torch.softmax(utility, dim=1)
-                loss = torch.sum(utility * batch_emission, dim=1).mean()
+                utility = torch.softmax(-utility, dim=-1)
+                loss = -torch.sum(utility * batch_emission, dim=1).mean()
                 loss.backward()
                 total_loss += loss.item()
             num = len(data["train"])
@@ -88,7 +88,7 @@ def transform(data, batch_size, seed):
     generator = np.random.RandomState(seed)
 
     emissions = [[] for _ in range(len(data) // batch_size)]
-    time = [[] for _ in range(len(data) // batch_size)]
+    times = [[] for _ in range(len(data) // batch_size)]
     price = [[] for _ in range(len(data) // batch_size)]
     train = [[] for _ in range(len(data) // batch_size)]
 
@@ -100,7 +100,7 @@ def transform(data, batch_size, seed):
         batch = [data[i] for i in batch_id]
         for test in batch:
             emissions[batch_i].append([])
-            time[batch_i].append([])
+            times[batch_i].append([])
             price[batch_i].append([])
             train[batch_i].append([])
             random.shuffle(test)
@@ -108,7 +108,7 @@ def transform(data, batch_size, seed):
             # print(len(test))
             for (emission, time, cost) in test:
                 emissions[batch_i][-1].append(emission)
-                time[batch_i][-1].append(time)
+                times[batch_i][-1].append(time)
                 price[batch_i][-1].append(cost)
                 train[batch_i][-1].append(emission)
                 train[batch_i][-1].append(time)
@@ -116,7 +116,7 @@ def transform(data, batch_size, seed):
     return {
         "train": torch.Tensor(train),
         "emission": torch.Tensor(emissions),
-        "time": torch.Tensor(time),
+        "time": torch.Tensor(times),
         "cost": torch.Tensor(price),
     }
 
@@ -177,3 +177,5 @@ def helper(model, data):
     for i in pred[0][0][0]:
         ans.append(i.item()*R)
     return ans
+
+train_m()
